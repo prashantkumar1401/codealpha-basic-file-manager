@@ -3,10 +3,10 @@
 #include <fstream>    // For file operations
 #include <string>
 #include <vector>
+#include <sstream>
+#include <iterator>
+
 //  Displaying the Current Directory
-
-
-
 void displayCurrentDirectory() {
     std::string currentPath = std::filesystem::current_path().string();
     std::cout << "Current Directory: " << currentPath << std::endl;
@@ -18,17 +18,12 @@ void listDirectoryContents() {
     }
 }
 
-
 //   Navigating Directories
-
 void changeDirectory(const std::string& path) {
     std::filesystem::current_path(path);
 }
 
-
-
 //    Viewing File Contents
-
 void viewFileContents(const std::string& filename) {
     std::ifstream file(filename);
     if (file.is_open()) {
@@ -42,10 +37,7 @@ void viewFileContents(const std::string& filename) {
     }
 }
 
-
-
 //   Creating a Directory
-
 void createDirectory(const std::string& dirName) {
     if (std::filesystem::create_directory(dirName)) {
         std::cout << "Directory created: " << dirName << std::endl;
@@ -54,10 +46,7 @@ void createDirectory(const std::string& dirName) {
     }
 }
 
-
-
 //   Copying or Moving Files
-
 void copyFile(const std::string& source, const std::string& destination) {
     try {
         std::filesystem::copy(source, destination);
@@ -76,11 +65,7 @@ void moveFile(const std::string& source, const std::string& destination) {
     }
 }
 
-
-
 //    Implement the Command-Line Interface
-
-
 void showHelp() {
     std::cout << "Commands:" << std::endl;
     std::cout << "  ls         - List directory contents" << std::endl;
@@ -99,30 +84,13 @@ int main() {
         std::cout << "> ";
         std::getline(std::cin, command);
         std::istringstream iss(command);
-        std::vector<std::string> tokens{std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{}};
+        std::vector<std::string> tokens;
+        for (std::string token; iss >> token; ) {
+            tokens.push_back(token);
+        }
 
         if (tokens.empty()) continue;
 
         if (tokens[0] == "ls") {
             listDirectoryContents();
-        } else if (tokens[0] == "cd" && tokens.size() == 2) {
-            changeDirectory(tokens[1]);
-        } else if (tokens[0] == "cat" && tokens.size() == 2) {
-            viewFileContents(tokens[1]);
-        } else if (tokens[0] == "mkdir" && tokens.size() == 2) {
-            createDirectory(tokens[1]);
-        } else if (tokens[0] == "cp" && tokens.size() == 3) {
-            copyFile(tokens[1], tokens[2]);
-        } else if (tokens[0] == "mv" && tokens.size() == 3) {
-            moveFile(tokens[1], tokens[2]);
-        } else if (tokens[0] == "help") {
-            showHelp();
-        } else if (tokens[0] == "exit") {
-            break;
-        } else {
-            std::cout << "Unknown command. Type 'help' for a list of commands." << std::endl;
-        }
-    }
-
-    return 0;
-}
+        } else if (tokens[0] == "cd" && tokens.size() ==
